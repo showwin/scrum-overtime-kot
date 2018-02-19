@@ -15,12 +15,14 @@ CONFIG_PATH = os.path.join(os.environ['HOME'], '.sokot', 'config.json')
 
 
 class SokotConfiguration():
+    def __init__(self):
+        if not os.path.exists(SOKOT_CONFIG_DIR):
+            os.mkdir(SOKOT_CONFIG_DIR)
+
     def _is_configured(self):
         return os.path.exists(TOKEN_PATH) and os.path.exists(CONFIG_PATH)
 
     def _set_token(self, token):
-        if not os.path.exists(SOKOT_CONFIG_DIR):
-            os.mkdir(SOKOT_CONFIG_DIR)
         f = open(TOKEN_PATH, 'w')
         f.write(token)
         f.close()
@@ -32,13 +34,13 @@ class SokotConfiguration():
         return token
 
     def _set_config(self, config_dict):
-        if not os.path.exists(SOKOT_CONFIG_DIR):
-            os.mkdir(SOKOT_CONFIG_DIR)
         f = open(CONFIG_PATH, 'w')
         f.write(json.dumps(config_dict))
         f.close()
 
     def _get_config(self):
+        if not os.path.exists(CONFIG_PATH):
+            return {}
         f = open(CONFIG_PATH, 'r')
         json_str = f.read()
         f.close()
@@ -67,7 +69,9 @@ class SokotConfiguration():
 
     def get_scrum_start_day(self):
         config = self._get_config()
-        date_str = config['scrum_start']
+        date_str = config.get('scrum_start', None)
+        if not date_str:
+            return datetime.date.today()
         return datetime.datetime.strptime(date_str, '%Y.%m.%d').date()
 
     def add_group(self, name, *members):
