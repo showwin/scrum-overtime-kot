@@ -48,10 +48,8 @@ class SokotAggretator():
         return sprints
 
     def _aggregate_sprint(self, members, sprint_start, sprint_end):
-        print('/daily-workings?start={}&end={}'.format(sprint_start, sprint_end))
-
-        # resp = self._requester.get('/daily-workings?start={}&end={}'.format(sprint_start, sprint_end))
-        resp = DUMMY_RESP
+        token = self._config.get_token()
+        resp = self._requester.get('/daily-workings?start={}&end={}'.format(sprint_start, sprint_end), token)
         sum_min = 0
         for daily_record in resp:
             for record in daily_record['dailyWorkings']:

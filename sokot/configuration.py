@@ -27,6 +27,9 @@ class SokotConfiguration():
         f.write(token)
         f.close()
 
+    def get_token(self):
+        return self._get_token()
+
     def _get_token(self):
         f = open(TOKEN_PATH, 'r')
         token = f.read()
