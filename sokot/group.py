@@ -1,4 +1,4 @@
-from configuration import SokotConfiguration
+from sokot.configuration import SokotConfiguration
 
 
 class SokotGroup():

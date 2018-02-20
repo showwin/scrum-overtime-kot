@@ -1,9 +1,9 @@
 import fire
 
-from aggregator import SokotAggretator
-from configuration import SokotConfiguration
-from group import SokotGroup
-from requester import SokotRequester
+from sokot.aggregator import SokotAggretator
+from sokot.configuration import SokotConfiguration
+from sokot.group import SokotGroup
+from sokot.requester import SokotRequester
 
 
 class Sokot():

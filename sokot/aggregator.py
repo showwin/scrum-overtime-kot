@@ -2,8 +2,8 @@ import datetime
 
 from beautifultable import BeautifulTable
 
-from configuration import SokotConfiguration
-from requester import SokotRequester
+from sokot.configuration import SokotConfiguration
+from sokot.requester import SokotRequester
 
 DAILY_WORKING_API = '/daily-workings?start={}&end={}&additionalFields=currentDateEmployee'
 
