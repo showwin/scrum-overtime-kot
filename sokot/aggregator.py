@@ -5,27 +5,7 @@ from beautifultable import BeautifulTable
 from configuration import SokotConfiguration
 from requester import SokotRequester
 
-DUMMY_RESP = [{
-    "date": "2016-05-01",
-    "dailyWorkings": [{
-        "date": "2016-05-01",
-        "employeeKey": "8b6ee646a9620b286499c3df6918c4888a97dd7bbc6a26a18743f4697a1de4b3",
-        "currentDateEmployee": {
-            "divisionCode": "1000",
-            "divisionName": "本社",
-            "gender": "male",
-            "typeCode": "1",
-            "typeName": "正社員",
-            "code": "0003",
-            "lastName": "勤怠",
-            "firstName": "太郎",
-            "lastNamePhonetics": "キンタイ",
-            "firstNamePhonetics": "タロウ"
-        },
-        "isClosing": True,
-        "overtime": 135,
-    }]
-}]
+DAILY_WORKING_API = '/daily-workings?start={}&end={}&additionalFields=currentDateEmployee'
 
 
 class SokotAggretator():
@@ -49,13 +29,12 @@ class SokotAggretator():
 
     def _aggregate_sprint(self, members, sprint_start, sprint_end):
         token = self._config.get_token()
-        resp = self._requester.get('/daily-workings?start={}&end={}'.format(sprint_start, sprint_end), token)
+        resp = self._requester.get(DAILY_WORKING_API.format(sprint_start, sprint_end), token)
         sum_min = 0
         for daily_record in resp:
             for record in daily_record['dailyWorkings']:
                 if record['currentDateEmployee']['code'] in members:
-                    if record['isClosing']:
-                        sum_min += record['overtime']
+                    sum_min += record['overtime']
         return round(sum_min / 60, 2)
 
     def aggregate(self, agg_type):
