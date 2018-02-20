@@ -21,11 +21,17 @@ class SokotAggretator():
         while True:
             if sprint_start > datetime.date.today():
                 break
-            sprint_end = sprint_start + datetime.timedelta(days=14)
+            sprint_end = sprint_start + datetime.timedelta(days=13)
             sprint = (sprint_start, sprint_end)
             sprints.append(sprint)
-            sprint_start = sprint_end
+            sprint_start = sprint_end + datetime.timedelta(days=1)
         return sprints
+
+    def _print_warning(self, record):
+        last_name = record['currentDateEmployee']['lastName']
+        first_name = record['currentDateEmployee']['firstName']
+        error_date = record['date']
+        print('{} {}さんの{}の入力にエラーがあります'.format(last_name, first_name, error_date))
 
     def _aggregate_sprint(self, members, sprint_start, sprint_end):
         token = self._config.get_token()
@@ -34,7 +40,10 @@ class SokotAggretator():
         for daily_record in resp:
             for record in daily_record['dailyWorkings']:
                 if record['currentDateEmployee']['code'] in members:
-                    sum_min += record['overtime']
+                    if record['isError']:
+                        self._print_warning(record)
+                    else:
+                        sum_min += record['overtime']
         return round(sum_min / 60, 2)
 
     def aggregate(self, agg_type):
