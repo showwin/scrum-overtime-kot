@@ -1,4 +1,5 @@
 import json
+import sys
 
 import requests
 
@@ -17,10 +18,18 @@ class SokotRequester():
         self.headers['Authorization'] = self.headers['Authorization'].format(token=token)
         url = self.base_url + uri
         resp = requests.get(url, headers=self.headers)
-        return json.loads(resp.text)
+        resp_json = json.loads(resp.text)
+        if 'errors' in resp_json:
+            print(resp_json['errors'][0]['message'])
+            sys.exit(1)
+        return resp_json
 
     def post(self, uri, token, payload):
         self.headers['Authorization'] = self.headers['Authorization'].format(token=token)
         url = self.base_url + uri
         resp = requests.post(url, headers=self.headers, data=payload)
-        return json.loads(resp.text)
+        resp_json = json.loads(resp.text)
+        if 'errors' in resp_json:
+            print(resp_json['errors'][0]['message'])
+            sys.exit(1)
+        return resp_json
