@@ -3,6 +3,7 @@ import fire
 from sokot.aggregator import SokotAggretator
 from sokot.configuration import SokotConfiguration
 from sokot.group import SokotGroup
+from sokot.proxy import SokotProxy
 from sokot.requester import SokotRequester
 
 
@@ -12,6 +13,7 @@ class Sokot():
         self._requester = SokotRequester()
         self._aggregator = SokotAggretator()
         self.group = SokotGroup()
+        self.proxy = SokotProxy()
 
     def configure(self):
         self._config.create()
