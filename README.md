@@ -12,7 +12,7 @@ KING OF TIME (KOT)のAPIを叩いてスプリント毎のチームの残業時�
 ## インストール
 
 ```
-$ pip install sokot  # TODO
+$ pip install sokot
 ```
 
 ## 使い方
