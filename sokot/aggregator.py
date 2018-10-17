@@ -1,3 +1,4 @@
+import copy
 import datetime
 
 from beautifultable import BeautifulTable
@@ -6,6 +7,7 @@ from sokot.configuration import SokotConfiguration
 from sokot.requester import SokotRequester
 
 DAILY_WORKING_API = '/daily-workings?start={}&end={}&additionalFields=currentDateEmployee'
+EMPLOYEE_API = '/employees/{}'
 
 
 class SokotAggretator():
@@ -13,6 +15,7 @@ class SokotAggretator():
         self._config = SokotConfiguration()
         self._sprints = self._culc_sprint()
         self._requester = SokotRequester()
+        self._name_cache = {}
 
     def _culc_sprint(self):
         sprints = []
@@ -27,23 +30,41 @@ class SokotAggretator():
             sprint_start = sprint_end + datetime.timedelta(days=1)
         return sprints
 
-    def _print_warning(self, record):
-        last_name = record['currentDateEmployee']['lastName']
-        first_name = record['currentDateEmployee']['firstName']
-        error_date = record['date']
-        print('{} {}さんの{}の入力にエラーがあります'.format(last_name, first_name, error_date))
+    def _get_name(self, employee_code):
+        if employee_code in self._name_cache:
+            return self._name_cache[employee_code]
+        token = self._config.get_token()
+        resp = self._requester.get(EMPLOYEE_API.format(employee_code), token)
+        name = '{} {}'.format(resp['lastName'], resp['firstName'])
+        self._name_cache[employee_code] = name
+        return name
+
+    def _print_warning(self, employee_code, date):
+        name = self._get_name(employee_code)
+        print('{}さんの{}の入力にエラーがあります'.format(name, date))
 
     def _aggregate_sprint(self, members, sprint_start, sprint_end):
+        """
+        members: 従業員コードリスト
+        """
         token = self._config.get_token()
         resp = self._requester.get(DAILY_WORKING_API.format(sprint_start, sprint_end), token)
         sum_min = 0
         for daily_record in resp:
+            unfilled_member = copy.deepcopy(members)
             for record in daily_record['dailyWorkings']:
                 if record['currentDateEmployee']['code'] in members:
+                    # 入力の仕方が間違っている人を抽出
                     if record['isError']:
-                        self._print_warning(record)
+                        employee_code = record['currentDateEmployee']['code']
+                        self._print_warning(employee_code, record['date'])
                     else:
                         sum_min += record['overtime']
+                    unfilled_member.remove(record['currentDateEmployee']['code'])
+            # そもそも入力していない人を抽出
+            for member in unfilled_member:
+                self._print_warning(member, daily_record['date'])
+
         return round(sum_min / 60, 2)
 
     def aggregate(self, agg_type):
