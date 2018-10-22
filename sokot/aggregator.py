@@ -2,11 +2,11 @@ import copy
 import datetime
 
 from beautifultable import BeautifulTable
-
 from sokot.configuration import SokotConfiguration
 from sokot.requester import SokotRequester
 
 DAILY_WORKING_API = '/daily-workings?start={}&end={}&additionalFields=currentDateEmployee'
+DAILY_SCHEDULE_API = '/daily-schedules?start={}&end={}&additionalFields=currentDateEmployee'
 EMPLOYEE_API = '/employees/{}'
 
 
@@ -49,6 +49,7 @@ class SokotAggretator():
         """
         token = self._config.get_token()
         resp = self._requester.get(DAILY_WORKING_API.format(sprint_start, sprint_end), token)
+        schedules = self._requester.get(DAILY_SCHEDULE_API.format(sprint_start, sprint_end), token)
         sum_min = 0
         for daily_record in resp:
             unfilled_member = copy.deepcopy(members)
@@ -63,7 +64,10 @@ class SokotAggretator():
                     unfilled_member.remove(record['currentDateEmployee']['code'])
             # そもそも入力していない人を抽出
             for member in unfilled_member:
-                self._print_warning(member, daily_record['date'])
+                daily_schedule = [daily['dailySchedules'] for daily in schedules if daily['date'] == daily_record['date']][0]
+                for schedule in daily_schedule:
+                    if schedule['currentDateEmployee']['code'] == member and schedule['scheduleTypeName'] == '通常勤務':
+                        self._print_warning(member, daily_record['date'])
 
         return round(sum_min / 60, 2)
 
