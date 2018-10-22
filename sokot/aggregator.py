@@ -2,12 +2,14 @@ import copy
 import datetime
 
 from beautifultable import BeautifulTable
+
 from sokot.configuration import SokotConfiguration
 from sokot.requester import SokotRequester
 
 DAILY_WORKING_API = '/daily-workings?start={}&end={}&additionalFields=currentDateEmployee'
 DAILY_SCHEDULE_API = '/daily-schedules?start={}&end={}&additionalFields=currentDateEmployee'
 EMPLOYEE_API = '/employees/{}'
+MAX_DAYS_OF_MONTH = 31
 
 
 class SokotAggretator():
@@ -40,8 +42,13 @@ class SokotAggretator():
         return name
 
     def _print_warning(self, employee_code, date):
-        name = self._get_name(employee_code)
-        print('{}さんの{}の入力にエラーがあります'.format(name, date))
+        """
+        MAX_DAYS_OF_MONTH 日前までのエラーのみ表示する
+        """
+        date_datetime = datetime.datetime.strptime(date, '%Y-%m-%d')
+        if (datetime.datetime.now() - date_datetime).days <= MAX_DAYS_OF_MONTH:
+            name = self._get_name(employee_code)
+            print('{}さんの{}の入力にエラーがあります'.format(name, date))
 
     def _aggregate_sprint(self, members, sprint_start, sprint_end):
         """
