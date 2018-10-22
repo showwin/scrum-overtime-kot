@@ -10,7 +10,7 @@ DEPENDENCIES = [
 TEST_DEPENDENCIES = [
 ]
 
-VERSION = '0.1.1'
+VERSION = '0.1.2'
 URL = 'https://github.com/showwin/scrum-overtime-kot'
 
 setup(
