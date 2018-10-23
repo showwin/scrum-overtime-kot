@@ -4,13 +4,15 @@ SHORT_DESCRIPTION = """
 A tool to get your member's overtime from King of Time for every N weeks.""".strip()
 
 DEPENDENCIES = [
-    'fire',
+    'fire==0.1.2',
+    'beautifultable==0.4.0',
+    'requests==2.18.4',
 ]
 
 TEST_DEPENDENCIES = [
 ]
 
-VERSION = '0.1.3'
+VERSION = '0.1.4'
 URL = 'https://github.com/showwin/scrum-overtime-kot'
 
 setup(
