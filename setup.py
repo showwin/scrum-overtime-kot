@@ -6,7 +6,7 @@ A tool to get your member's overtime from King of Time for every N weeks.""".str
 DEPENDENCIES = [
     'fire==0.1.2',
     'beautifultable==0.4.0',
-    'requests==2.18.4',
+    'requests==2.20.0',
 ]
 
 TEST_DEPENDENCIES = [
